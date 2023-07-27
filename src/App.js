@@ -5,25 +5,31 @@ import { taskMiddleware } from "react-palm/tasks";
 import { Provider, useDispatch } from "react-redux";
 import KeplerGl from "kepler.gl";
 import useSwr from "swr";
-import {wrapTo, loadCustomMapStyle, addDataToMap, addCustomMapStyle} from 'kepler.gl/actions';
+import {
+  wrapTo,
+  loadCustomMapStyle,
+  addDataToMap,
+  addCustomMapStyle,
+} from "kepler.gl/actions";
 import covidData from "./covid.json";
+import style from "./style.json";
 
 const reducers = combineReducers({
-  keplerGl: keplerGlReducer
+  keplerGl: keplerGlReducer,
 });
 
 const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
 const wrapIt = wrapTo("map");
 
 const OpenMapTilesStyles = {
-  layers : [
+  layers: [
     {
-      id: 'voyager',
-      label: 'Voyager',
-      url: 'https://api.maptiler.com/maps/voyager/style.json?key=kznYvrAC6DrOZXPCW05C',
-      icon: 'https://api.maptiler.com/maps/voyager/256/0/0/0.png?key=kznYvrAC6DrOZXPCW05C'
-    }
-  ] 
+      id: "voyager",
+      label: "Voyager",
+      url: "https://api.maptiler.com/maps/voyager/style.json?key=kznYvrAC6DrOZXPCW05C",
+      icon: "https://api.maptiler.com/maps/voyager/256/0/0/0.png?key=kznYvrAC6DrOZXPCW05C",
+    },
+  ],
 };
 
 export default function App() {
@@ -34,7 +40,7 @@ export default function App() {
   );
 }
 
-const Map = props => {
+const Map = (props) => {
   const dispatch = useDispatch();
   // const { data } = useSwr("covid", async () => {
   //   const response = await fetch(
@@ -52,38 +58,37 @@ const Map = props => {
           datasets: {
             info: {
               label: "COVID-19",
-              id: "covid19"
+              id: "covid19",
             },
-            data
+            data,
           },
           option: {
             centerMap: true,
-            readOnly: false
+            readOnly: false,
           },
-          config: {}
+          config: {},
         })
       );
     }
     dispatch(
       wrapIt(
         loadCustomMapStyle({
-          style: OpenMapTilesStyles,
-          error: false
+          style: style,
+          error: false,
         })
       )
     );
     dispatch(wrapIt(addCustomMapStyle()));
   }, [dispatch, data]);
 
-
   return (
     <KeplerGl
       id="map"
       mapboxApiAccessToken=""
       // mapStyles={mapStyles}
-      mapStylesReplaceDefault={true} 
+      mapStylesReplaceDefault={true}
       width={window.innerWidth}
       height={window.innerHeight}
     />
   );
-}
+};
