@@ -4,33 +4,10 @@ import { createStore, combineReducers, applyMiddleware } from "redux";
 import { taskMiddleware } from "react-palm/tasks";
 import { Provider, useDispatch } from "react-redux";
 import KeplerGl from "kepler.gl";
-import useSwr from "swr";
 import {
-  wrapTo,
-  loadCustomMapStyle,
   addDataToMap,
-  addCustomMapStyle,
 } from "kepler.gl/actions";
 import covidData from "./covid.json";
-import style from "./style.json";
-
-const reducers = combineReducers({
-  keplerGl: keplerGlReducer,
-});
-
-const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
-const wrapIt = wrapTo("map");
-
-const OpenMapTilesStyles = {
-  layers: [
-    {
-      id: "voyager",
-      label: "Voyager",
-      url: "https://api.maptiler.com/maps/voyager/style.json?key=kznYvrAC6DrOZXPCW05C",
-      icon: "https://api.maptiler.com/maps/voyager/256/0/0/0.png?key=kznYvrAC6DrOZXPCW05C",
-    },
-  ],
-};
 
 export default function App() {
   return (
@@ -40,17 +17,50 @@ export default function App() {
   );
 }
 
-const Map = (props) => {
-  const dispatch = useDispatch();
-  // const { data } = useSwr("covid", async () => {
-  //   const response = await fetch(
-  //     "https://gist.githubusercontent.com/leighhalliday/a994915d8050e90d413515e97babd3b3/raw/a3eaaadcc784168e3845a98931780bd60afb362f/covid19.json"
-  //   );
-  //   const data = await response.json();
-  //   return data;
-  // });
-  const data = covidData;
+const customizedKeplerGlReducer = keplerGlReducer.initialState({
+  mapStyle: {
+    mapStyles: {
+      // todo style.json 응답시 내부에 maptile이 없어 호출 실패나는 현상 확인 필요!!
+      positron: {
+        id: 'positron',
+        label: 'Positron',
+        url: 'https://p-imbauth1.carrotins.com:8088/styles/positron/style.json',
+        icon: 'https://p-imbauth1.carrotins.com:8088/styles/positron/7/109/50.png'
+      },
+      terrain: {
+        id: 'osm',
+        label: 'OSM Bright',
+        url: 'https://p-imbauth1.carrotins.com:8088/styles/osm-bright/style.json',
+        icon: 'https://p-imbauth1.carrotins.com:8088/styles/osm-bright/7/109/50.png',
+        layerGroups: [
+          {
+            slug: 'label',
+            filter: ({id}) => id.match(/(?=(label|place-|poi-))/),
+            defaultVisibility: true
+          },
+          {
+            slug: 'road',
+            filter: ({id}) => id.match(/(?=(road|railway|tunnel|street|bridge))(?!.*label)/),
+            defaultVisibility: true
+          }
+        ]
+      }
+    },
+    // Set initial map style 
+    styleType: 'positron'
+  }
+});
 
+const reducers = combineReducers({
+  keplerGl: customizedKeplerGlReducer,
+});
+
+const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
+
+const Map = props => {
+  const dispatch = useDispatch();
+
+  const data = covidData;
   React.useEffect(() => {
     if (data) {
       dispatch(
@@ -70,15 +80,6 @@ const Map = (props) => {
         })
       );
     }
-    dispatch(
-      wrapIt(
-        loadCustomMapStyle({
-          style: style,
-          error: false,
-        })
-      )
-    );
-    dispatch(wrapIt(addCustomMapStyle()));
   }, [dispatch, data]);
 
   return (
@@ -86,7 +87,7 @@ const Map = (props) => {
       id="map"
       mapboxApiAccessToken=""
       // mapStyles={mapStyles}
-      mapStylesReplaceDefault={true}
+      // mapStylesReplaceDefault={true}
       width={window.innerWidth}
       height={window.innerHeight}
     />
