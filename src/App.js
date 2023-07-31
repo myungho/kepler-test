@@ -24,14 +24,14 @@ const customizedKeplerGlReducer = keplerGlReducer.initialState({
       positron: {
         id: 'positron',
         label: 'Positron',
-        url: 'https://auth.carrotins.com:8088/maptile/styles/positron/style.json',
-        icon: 'https://auth.carrotins.com:8088/maptile/styles/positron/7/109/50.png'
+        url: 'https://p-imbauth1.carrotins.com:8088/styles/positron/style.json',
+        icon: 'https://p-imbauth1.carrotins.com:8088/styles/positron/7/109/50.png'
       },
       terrain: {
         id: 'osm',
         label: 'OSM Bright',
-        url: 'https://auth.carrotins.com:8088/maptile/styles/osm-bright/style.json',
-        icon: 'https://auth.carrotins.com:8088/maptile/styles/osm-bright/7/109/50.png',
+        url: 'https://p-imbauth1.carrotins.com:8088/styles/osm-bright/style.json',
+        icon: 'https://p-imbauth1.carrotins.com:8088/styles/osm-bright/7/109/50.png',
         layerGroups: [
           {
             slug: 'label',
@@ -85,7 +85,7 @@ const Map = props => {
   return (
     <KeplerGl
       id="map"
-      mapboxApiAccessToken="pk.eyJ1IjoibGpqN2tyIiwiYSI6ImNra3JvcGoxcTB5cG0ybnMxbnk0bDF0ZmUifQ.lEiOIr5N1M6mjDH10aC8MQ"
+      mapboxApiAccessToken=""
       // mapStyles={mapStyles}
       // mapStylesReplaceDefault={true}
       width={window.innerWidth}
